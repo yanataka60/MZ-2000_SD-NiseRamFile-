@@ -8,6 +8,8 @@
 
 ・MZ-2000_SDの起動及びMZ-2000_SDの機能
 
+・EMM1からの起動(ただし、EMM1にHu-BASICの起動ディスクイメージがある場合のみ)
+
 ・MZ-2000のテキスト出力及びグラフィック出力をエミュレートしてVGA出力
 
 ・EMM1エミュレータ
@@ -83,84 +85,96 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 https://github.com/yanataka60/MZ-2000_SD/blob/main/EMM/BOOT_A_LOADER.bin
 
-　書き込み方の詳細は偽RAMFILE for MZ-1500を参照してください。
-
-https://github.com/shippoiincho/niseramfile/tree/main?tab=readme-ov-file#mz-1r12-sram-%E3%83%A1%E3%83%A2%E3%83%AA
-
-　なお、書き込みにpicotool.exeを利用する場合には以下のウェブページ右側の「Releases」からダウンロードできます。
+　書き込みにはpicotool.exeが必要となります。以下のウェブページ右側の「Releases」からダウンロードできます。
 
 https://github.com/raspberrypi/pico-sdk-tools
 
-　SDカードに「@BOOT-A MZ-2000.bin」を置いておく必要があります。作成方法は、MZ-2000_SDを参照してください。
+```
+picotool.exe load -v -x BOOT_A_LOADER.bin  -t bin -o 0x10080000
+```
 
-　また、EMMから起動するためには、MZ-2000_SDリポジトリEMMフォルダ内の「@BOOT-EMM1.MZT」、「@BOOT-EMM2.MZT」、「@BOOT-EMM3.MZT」をSDカードにコピーしておく必要があります。
+　次にSDカードに「@BOOT-A MZ-2000.bin」を置きます。作成方法は、MZ-2000_SDを参照してください。
+
+https://github.com/yanataka60/MZ-2000_SD?tab=readme-ov-file#boot-a-mz-xxxxbin%E3%82%92%E4%BD%9C%E6%88%90%E3%81%97%E3%81%A6sd-card%E3%81%AB%E4%BF%9D%E5%AD%98%E3%81%99%E3%82%8B
+
+　また、EMM1に起動可能な内容(HuBASIC起動イメージ)があればEMMからの起動が可能です。
+
+　EMMの内容をチェックしていないのでEMMが起動可能な内容(HuBASIC起動イメージ)でなかった場合には暴走しますのでご注意ください。
+
+　EMMから起動するためには、MZ-2000_SDリポジトリEMMフォルダ内の「@BOOT-EMM1.MZT」をSDカードにコピーしておく必要があります。
+
+　EMM1からの起動方法は、「/」キーとテンキーの「1」を同時に押しながら電源ON時又はIPLリセットすることで「EMM1」のHuBASICから起動させることが出来ます。
 
 ## Arduinoプログラム
 　MZ-2000_SDを参照してください。
 
 https://github.com/yanataka60/MZ-2000_SD?tab=readme-ov-file#arduino%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0-1
 
-## 運用の注意点
-　偽RAMFILE for MZ-2000のEMMは自動的にバックアップされません。
-
-　電源ON時に0番EMMスロットの内容が自動的にEMMにLOADされますが、電源OFF時にEMMの内容は消滅します。
-
-　EMMの内容を書き込み・修正等した場合にはEMMの内容をスロットに書き込む動作を行う必要があります。
-
-https://github.com/shippoiincho/niseramfile/tree/main?tab=readme-ov-file#pio-3034-emm
-
-## EMMからの起動
-　「EMM0」に起動可能なMZ-700用HuBASICが存在している場合MZ-1500_SDからコマンド「FDE0」を実行することで「EMM0」のMZ-700用HuBASICから起動可能です。
-
-　なお、EMMの00000番地が「01h」でなければEMMからの起動はせずにコマンド待ちに戻りますが、00000番地以降に異常があってもチェックはしていないので最悪暴走します。
-
-　MZ-1500用HuBASIC、MZ-80K用HuBASICではEMMがサポートされていません。EMMが使えるのはMZ-700用HuBASICのみとなりますが、テープ版しかなくそのままではEMMにHuBASICの起動イメージを作成することが出来ません。
-
-　BouKiCHiさんのHuDiskなどを使いMZ-700用HuBASICの起動ディスクイメージを作成したうえでEMMMENUのEMMLOADでEMMに書き込む必要があります。
-
-## SAMPLEプログラム
-　SAMPLEフォルダ内にEMMMENU2を置きました。
-
-　使い方については、フォルダ内のREADME.mdを参照してください。
-
-　SDからEMMへLOAD、EMMの内容をSDへSAVE、EMMスロットからEMMへLOAD、EMMの内容をEMMスロットへSAVEが使えます。
-
 ## 拡張機能の使い方
-### 外部起動SRAM MZ-1R12(便宜上この名前とします)
-　MZ-2000を「/」キーを押しながら電源投入又はIPL RESETした時に読み込まれる起動プログラム「BOOT_A_LOADER.bin」が登録できます。
+### MZ-2000_SDの起動
+　MZ-2000_SDの起動方法と同じです。「/」キーを押しながら電源投入又はIPL RESETしてください。
 
-　前述の通り、MZ-1R12 SRAMメモリ 0番バックアップスロットへ書き込みことで電源投入又はIPL RESETした時に自動的に読み込まれます。
-
-### EMM1:エミュレータ
-　320kEMMとして機能します。バッテリーバックアップ機能はなく、電源断で内容は消失します。
+### EMM1エミュレータ
+　320kByteのEMM1として機能します。バッテリーバックアップ機能はなく、電源断で内容は消失します。
 
 　ただし、バックアップ用のSlotが32個用意されているので電源断前にSlotに退避しておくことが可能です。
 
 　また、Slot0の内容は電源投入又はIPL RESETした時にEMM1に自動的にコピーされるのであたかもバッテリーバックアップされていたかのような使い方が出来ます。
 
-#### Slotxxからの復帰
+　EMMとSlotとのやり取りはI/Oポートから指示します。
+
+#### SlotxxからEMM1への復帰
 |アドレス|R/W|説明|
 | ------------ | ------------ | ------------ |
 |8Ch|W|指定したSlot番号(0～31)のSlotの内容をEMM1に復帰|
 
-#### Slotxxへの退避
+#### EMM1からSlotxxへの退避
 |アドレス|R/W|説明|
 | ------------ | ------------ | ------------ |
 |8Dh|W|指定したSlot番号(0～31)のSlotへEMM1の内容を退避|
 
-#### EMMMENU
+HuBASICからは以下のようになります。
 
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|A4h|R|アドレスカウンタリセット|
-|A4h|W|アドレスカウンタ Bit[7:0]|
-|A5h|W|アドレスカウンタ Bit[15:8]|
-|A6h|W|アドレスカウンタ Bit[18:16]|
-|A7h|R|データ読み出し:アドレスカウンタ+1|
-|A7h|W|データ書き込み:アドレスカウンタ+1|
+```
+OUT &H8C,0
+```
+
+```
+OUT &H8D,0
+```
+
+　また、EMM1に起動可能な内容(HuBASIC起動イメージ)があればEMMからの起動が可能です。
+
+　EMMの内容をチェックしていないのでEMMが起動可能な内容(HuBASIC起動イメージ)でなかった場合には暴走しますのでご注意ください。
+
+　EMM1からの起動方法は、「/」キーとテンキーの「1」を同時に押しながら電源ON時又はIPLリセットすることで「EMM1」のHuBASICから起動させることが出来ます。
+
+　EMM1へのHuBASIC起動ディスクイメージ作成は、DISK版HuBASICのUtilityからEMM1へのCOPY ALLで作ってください。
+
+　また、Emulatorで作られたEMMイメージを登録する場合はpicotoolから以下のようにします。
+
+```
+picotool.exe load -v -x EMM_image.bin  -t bin -o 0x10280000
+```
+
+　MZ-1500_SD+NiseRamFileの様にEMMMENUも対応させたいと思います。
 
 ### 漢字・辞書ROM MZ-1R13
 　漢字・辞書ROM MZ-1R13から抽出したデータを登録します。
+
+　抽出にはGET1R13を使いました。
+
+http://fukui.s17.xrea.com/retro/mz2080b/mzgetkrom.html
+
+　出来上がったファイルをpicotoolで登録します。
+
+```
+picotool.exe load -v -x MZ_1R13_DIC.ROM -t bin -o 0x10040000
+```
+
+```
+picotool.exe load -v -x MZ_1R13.ROM  -t bin -o 0x10020000
+```
 
 ### PCG
 |アドレス|R/W|説明|
