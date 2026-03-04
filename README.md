@@ -191,8 +191,7 @@ https://github.com/shippoiincho/niseramfile/tree/main?tab=readme-ov-file#pio-303
 ### グラフィックパレット設定
 |アドレス|R/W|説明|
 | ------------ | ------------ | ------------ |
-|69h|W|上位4Bitで表す色コードを下位4Bitで表す色で表示する|
-|   | |起動時設定<br>  0x00<br>  0x11<br>  0x22<br>  0x33<br>  0x44<br>  0x55<br>  0x66<br>  0x77|
+|69h|W|上位4Bitで表す色コードを下位4Bitで表す色で表示する<br>　起動時設定<br>　0x00<br>  0x11<br>  0x22<br>  0x33<br>  0x44<br>  0x55<br>  0x66<br>  0x77|
 
 ### FONT登録
 |アドレス|R/W|説明|
