@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name mz-2000)(type KiCad)(uri ${KIPRJMOD}/mz-2000.pretty)(options "")(descr ""))
+  (lib (name Kiacd_MZ-2000)(type KiCad)(uri C:/Users/yanat/Documents/GitHub/niseramfile/Kiacd_MZ-2000)(options "")(descr ""))
+  (lib (name MZ-1500)(type KiCad)(uri ${KIPRJMOD}/MZ-1500.pretty)(options "")(descr ""))
+)
