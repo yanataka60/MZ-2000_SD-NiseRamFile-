@@ -194,7 +194,7 @@ picotool.exe load -v -x MZ_1R13.ROM  -t bin -o 0x10020000
 ```
 
 ### FONT変更機能
-一時的にFONTを変更することが出来ます。電源断又はIPL RESETで元に戻ります。
+一時的にFONTを変更することが出来ます。電源断又はIPL RESETで元に戻ります。以下VGA出力機能に関する設定は電源断又はIPL RESETですべて元に戻ります
 
 キャラクタデータは1キャラクタ8Byteの普通のフォーマットです。
 
