@@ -1,6 +1,6 @@
 # MZ-2000_SD+偽RAMFILE複合ボード
 
-![MZ-2000_SD](https://github.com/yanataka60/MZ-1500_SD-NiseRamFile/blob/main/JPEG/TITLE.JPG)
+![MZ-2000_SD](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/JPEG/TITLE.JPG)
 
 しっぽいいんちょさんが作られた「偽RAMFILE for MZ-1500」を元にしてMZ-2000_SDと合体させたボードです。
 
@@ -30,14 +30,14 @@
 
 　　・テキストとグラフィックを色ごとにプライオリティ設定
 
-MZ-2000_SD: https://github.com/yanataka60/MZ-1500_SD
+MZ-2000_SD: https://github.com/yanataka60/MZ-2000_SD
 
 ## 回路図
 　KiCadフォルダ内のMZ-2000_SD+NRF.pdfを参照してください。
 
-[回路図](https://github.com/yanataka60/MZ-1500_SD-NiseRamFile/blob/main/Kicad/MZ-1500_SD%2BNRF.pdf)
+[回路図](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/Kiacd/MZ-2000_SD%2BNRF.pdf)
 
-![MZ-2000_SD](https://github.com/yanataka60/MZ-1500_SD-NiseRamFile/blob/main/Kicad/MZ-1500_SD%2BNRF.jpg)
+![MZ-2000_SD](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/Kiacd/MZ-2000_SD%2BNRF_1.jpg)
 
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
@@ -69,7 +69,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 ハンダ付けに自信のない方はJ5の秋月電子通商　AE-microSD-LLCNVをお使いください。AE-microSD-LLCNVならパワーLED、アクセスLEDが付いています。
 
-![MicroSD Card Adapter1](https://github.com/yanataka60/MZ-1500_SD-NiseRamFile/blob/main/JPEG/MicroSD%20Card%20Adapter.JPG)
+![MicroSD Card Adapter1](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/JPEG/MicroSD%20Card%20Adapter.JPG)
 
 ## 偽RAMFILE for MZ-2000の書込み
 　RP2350Bフォルダにあるniseramfile.uf2をRP2350Bマイコンボードに書き込みます。
@@ -81,7 +81,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ## MZ-2000_SD BOOT PROGRAMをMZ-1R12 SRAMメモリ 0番バックアップスロットへ書き込み
 　MZ-2000_SDリポジトリEMMフォルダ内のBOOT_A_LOADER.binをMZ-1R12 SRAMメモリ 0番バックアップスロットへ書き込んでください。
 
-https://github.com/yanataka60/MZ-1500_SD/blob/main/EMM/1Z-009B_SD_Launcher.bin
+https://github.com/yanataka60/MZ-2000_SD/blob/main/EMM/BOOT_A_LOADER.bin
 
 　書き込み方の詳細は偽RAMFILE for MZ-1500を参照してください。
 
@@ -98,7 +98,7 @@ https://github.com/raspberrypi/pico-sdk-tools
 ## Arduinoプログラム
 　MZ-2000_SDを参照してください。
 
-https://github.com/yanataka60/MZ-1500_SD/tree/main?tab=readme-ov-file#arduino%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0
+https://github.com/yanataka60/MZ-2000_SD?tab=readme-ov-file#arduino%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0-1
 
 ## 運用の注意点
 　偽RAMFILE for MZ-2000のEMMは自動的にバックアップされません。
@@ -169,7 +169,7 @@ https://github.com/shippoiincho/niseramfile/tree/main?tab=readme-ov-file#pio-303
 |61h|W|キャラクタコード指定|
 |62h|W|書き込みバンク指定(Blue:1,Red:2,Green:3)|
 |63h|W|データ書き込み:キャラクタコード+1|
-|67h|W|Bit1 優先順位 0:テキスト文字色＞PCG＞テキスト背景色<br>　　　　　　　1:PCG＞テキスト<br>Bit0 PCG表示  0:PCGを表示しない<br>　　　　　　　1:PCGを表示する|
+|67h|W|Bit1 優先順位 0:テキスト文字色＞PCG＞テキスト背景色<br>　　　　　　1:PCG＞テキスト<br>Bit0 PCG表示  0:PCGを表示しない<br>　　　　　　1:PCGを表示する|
 
 ### テキストパレット設定
 |アドレス|R/W|説明|
