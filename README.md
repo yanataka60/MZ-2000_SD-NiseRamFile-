@@ -44,14 +44,14 @@ MZ-2000_SD: https://github.com/yanataka60/MZ-2000_SD
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
 |J2,J3|ピンソケット2x15Pin|2|RP2350Bマイコンボード用,秋月電子通商 FHU-2x42SGなど|
-|J4|VGA用基板ソケット 3列15ピン|1|マルツ DJ-VGA14.5など|
+|J4|VGA用基板ソケット 3列15ピン|1|マルツ DJ-VGA14.5など (注1)|
 ||J5、J6のいずれか|||
-|J5|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注1)|
-|J6|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの(注3)|
+|J5|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2)|
+|J6|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの(注4)|
 |U1|74LS04|1||
 |U2|74LS30|1||
 |U3|8255|1||
-|U4|Arduino_Pro_Mini_5V|1|Atmega328版を使用 168版は不可。(注2)|
+|U4|Arduino_Pro_Mini_5V|1|Atmega328版を使用 168版は不可。(注3)|
 ||RP2350Bボード(Raspberry Pi Pico 2)|1|Amazon WA00021 RP2350Bマイコンボードなど|
 |C1-C3|積層セラミックコンデンサ 0.1uF|3||
 |C4|電解コンデンサ 16v100uF|1||
@@ -59,11 +59,15 @@ MZ-2000_SD: https://github.com/yanataka60/MZ-2000_SD
 ||ピンヘッダ|2Pin分|Arduino_Pro_MiniにはA4、A5用のピンヘッダが付いていないため別途調達が必要です 秋月電子通商 PH-1x40SGなど|
 ||ピンソケット(任意)|26Pin分|Arduino_Pro_Miniを取り外し可能としたい場合に調達します 秋月電子通商 FHU-1x42SGなど|
 
-　　　注1)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
+　　　注1)VGA用基板ソケットには、ピン間隔の異なるものがあるようです。マルツ DJ-VGA14.5ではないものを購入する場合はこちらで寸法を確認してください。
 
-　　　注2)Arduino Pro MiniはA4、A5ピンも使っています。
+　　　https://www.marutsu.co.jp/contents/shop/marutsu/datasheet/DJ-VGA14.5.pdf
 
-　　　注3)MicroSD Card Adapterを使う場合
+　　　注2)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
+
+　　　注3)Arduino Pro MiniはA4、A5ピンも使っています。
+
+　　　注4)MicroSD Card Adapterを使う場合
 
 　　　　　J6に取り付けます。
 
