@@ -735,6 +735,11 @@ static inline void io_write(uint16_t address, uint8_t data)
             gpallet[(data&0x70)>>4]=data&7;
             return;
 
+//        GRAPHIC color priority
+        case 0x6A:
+			graphic_prio[(data&0x70)>>4]=data&1;
+            return;
+
     	// BANK control
 
 //		FONT CHANGE
