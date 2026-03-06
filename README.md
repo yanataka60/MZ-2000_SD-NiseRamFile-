@@ -289,6 +289,7 @@ https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
 　フォントファイルを入れ替える必要があるためEmuz-2200用とされていましたがMZ-2000_SD+偽RAMFILE複合ボードなら遊ぶことが出来ます。
 
 　えむこまさんのサイトからダウンロードしたDEEP SCAN.zipを解凍するとFONT.ROMというファイルが含まれていますのでSampleフォルダのDEEP SCANフォルダにある「SET COLOR DEEP SCAN.mzt」の後ろにくっつけて一つのMZTファイルとします。
+
 　また、DEEP SCANの実行ファイルであるDEEP SCAN.wavはDumpList Editorなどを使ってMZTファイル化してください。(実行アドレスを2000hに指定してMZTファイル化すると便利です)
 
 　後はDEEP SCAN.MZTを実行する前にSET COLOR DEEP SCAN.mztを実行するだけです。
