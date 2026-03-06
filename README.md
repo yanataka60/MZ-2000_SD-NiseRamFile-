@@ -294,7 +294,10 @@ https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
 
 　後はDEEP SCAN.MZTを実行する前にSET COLOR DEEP SCAN.mztを実行するだけです。
 
-## 使用ライブラリなど
+## 開発環境、使用ライブラリなど
+　開発環境は、Visual Studio Codeです。
+
+　VGAライブラリは以下を使用しています。
 
 - [VGA ライブラリ(一部改変)](https://github.com/vha3/Hunter-Adams-RP2040-Demos/tree/master/VGA_Graphics)
 
@@ -309,3 +312,5 @@ https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
 2026.3.6 使用ライブラリの記載を追加。
 
 2026.3.6 Sampleプログラムを追加しました。
+
+2026.3.7 開発環境を追記。
