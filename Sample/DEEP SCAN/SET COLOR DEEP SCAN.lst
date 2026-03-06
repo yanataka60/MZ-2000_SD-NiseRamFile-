@@ -1,0 +1,104 @@
+﻿                                ;*** AILZ80ASM *** Z-80 Assembler, version 1.0.28.0, LST:Full:4
+000000 B000                             ORG 0B000H
+                                
+000000 B000 AF               4          XOR A
+000001 B001 D372            11          OUT (072H),A    ;キャラクタコード<-00h
+000003 B003 21A3B0          10          LD  HL,FONT     ;ラベルFONT以降に連結されたFONTデータでFONTを再定義
+000006 B006 010008          10          LD  BC,0800h
+000009 B009 7E               7  LOP1:       LD  A,(HL)
+00000A B00A D371            11          OUT (071H),A
+00000C B00C 23               6          INC HL
+00000D B00D 0B               6          DEC BC
+00000E B00E 78               4          LD  A,B
+00000F B00F B1               4          OR  C
+000010 B010 20F7            12          JR  NZ,LOP1
+                                        
+000012 B012 3E74             7          LD  A,74H
+000014 B014 D368            11          OUT (068H),A    ;テキストパレットで色コード7を緑に指定
+                                        
+000016 B016 3E2A             7          LD  A,2AH
+000018 B018 D37A            11          OUT (07AH),A    ;2Ah'*'の色を赤に指定
+00001A B01A 3E20             7          LD  A,20H
+00001C B01C D379            11          OUT (079H),A
+                                
+00001E B01E 3E60             7          LD  A,60H
+000020 B020 D37A            11          OUT (07AH),A    ;60hから5文字の色を赤に指定
+000022 B022 3E20             7          LD  A,20H
+000024 B024 D379            11          OUT (079H),A
+000026 B026 D379            11          OUT (079H),A
+000028 B028 D379            11          OUT (079H),A
+00002A B02A D379            11          OUT (079H),A
+00002C B02C D379            11          OUT (079H),A
+                                
+00002E B02E 3E6F             7          LD  A,6FH
+000030 B030 D37A            11          OUT (07AH),A    ;6Fhから2文字の色を赤に指定
+000032 B032 3E20             7          LD  A,20H
+000034 B034 D379            11          OUT (079H),A
+000036 B036 D379            11          OUT (079H),A
+                                
+000038 B038 3E65             7          LD  A,65H
+00003A B03A D37A            11          OUT (07AH),A    ;65hから10文字の色を青に指定
+00003C B03C 3E10             7          LD  A,10H
+00003E B03E D379            11          OUT (079H),A
+000040 B040 D379            11          OUT (079H),A
+000042 B042 D379            11          OUT (079H),A
+000044 B044 D379            11          OUT (079H),A
+000046 B046 D379            11          OUT (079H),A
+000048 B048 D379            11          OUT (079H),A
+00004A B04A D379            11          OUT (079H),A
+00004C B04C D379            11          OUT (079H),A
+00004E B04E D379            11          OUT (079H),A
+000050 B050 D379            11          OUT (079H),A
+                                
+000052 B052 3E75             7          LD  A,75H
+000054 B054 D37A            11          OUT (07AH),A    ;75hから5文字を水色に指定
+000056 B056 3E50             7          LD  A,50H
+000058 B058 D379            11          OUT (079H),A
+00005A B05A D379            11          OUT (079H),A
+00005C B05C D379            11          OUT (079H),A
+00005E B05E D379            11          OUT (079H),A
+000060 B060 D379            11          OUT (079H),A
+000062 B062 D379            11          OUT (079H),A
+                                
+000064 B064 3EA5             7          LD  A,0A5H
+000066 B066 D37A            11          OUT (07AH),A    ;A5hを水色に指定
+000068 B068 3E50             7          LD  A,50H
+00006A B06A D379            11          OUT (079H),A
+                                
+00006C B06C 3EF0             7          LD  A,0F0H
+00006E B06E D37A            11          OUT (07AH),A    ;F0hから11文字を水色に指定
+000070 B070 3E50             7          LD  A,50H
+000072 B072 D379            11          OUT (079H),A
+000074 B074 D379            11          OUT (079H),A
+000076 B076 D379            11          OUT (079H),A
+000078 B078 D379            11          OUT (079H),A
+00007A B07A D379            11          OUT (079H),A
+00007C B07C D379            11          OUT (079H),A
+00007E B07E D379            11          OUT (079H),A
+000080 B080 D379            11          OUT (079H),A
+000082 B082 D379            11          OUT (079H),A
+000084 B084 D379            11          OUT (079H),A
+000086 B086 D379            11          OUT (079H),A
+                                
+000088 B088 3EAA             7          LD  A,0AAH
+00008A B08A D37A            11          OUT (07AH),A    ;AAhを黄色に指定
+00008C B08C 3E60             7          LD  A,60H
+00008E B08E D379            11          OUT (079H),A
+000090 B090 3EB4             7          LD  A,0B4H
+                                
+000092 B092 D37A            11          OUT (07AH),A    ;B4hを黄色に指定
+000094 B094 3E60             7          LD  A,60H
+000096 B096 D379            11          OUT (079H),A
+000098 B098 3E2B             7          LD  A,2BH
+                                
+00009A B09A D37A            11          OUT (07AH),A    ;2Bh'+'を赤に指定
+00009C B09C 3E20             7          LD  A,20H
+00009E B09E D379            11          OUT (079H),A
+                                        
+0000A0 B0A0 C3B100          10          JP  00B1H       ;MONITORに復帰
+                                
+0000A3 B0A3                     FONT:       ds  2047        ;MZTヘッダ用に仮に設定
+0008A2 B8A2 FF                          db  0FFh
+                                
+                                            END
+[EOF:SET_COLOR_DEEP_SCAN.s:UTF_8]
