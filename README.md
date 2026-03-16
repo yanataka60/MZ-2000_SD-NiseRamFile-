@@ -294,6 +294,26 @@ https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
 
 　後はDEEP SCAN.MZTを実行する前にSET COLOR DEEP SCAN.mztを実行するだけです。
 
+## おまけ
+　グラフィックボードを装着していないMZ-2000でもVGA出力からカラーグラフィックが正常に利用できるバージョンを作ってみました。
+
+　uf2ファイル
+
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/OMAKE/RP2350B/niseramfile_No_GVRAM.uf2
+
+　ソースファイル
+
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/tree/main/OMAKE/Source(No_GVRAM)
+
+### 使用上の注意
+　グラフィックボートが装着されていないこと。
+
+　プレーン1のみのグラフィックボートが装着されている場合も取り外してください。
+
+　MZ-2200もグラフィックボートを取り外せば使えます。
+
+　MZ-80B、MZ-2500(80B、2000、2500モードとも)では正常に動作しません。通常のバージョンを使ってください。
+
 ## 開発環境、使用ライブラリなど
 　開発環境は、Visual Studio Codeです。
 
@@ -314,3 +334,6 @@ https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
 2026.3.6 Sampleプログラムを追加しました。
 
 2026.3.7 開発環境を追記。
+
+2026.3.16 おまけとしてNo_GVRAMバージョンを追加。
+
