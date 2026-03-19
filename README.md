@@ -1,8 +1,16 @@
-# MZ-2000_SD+偽RAMFILE複合ボード
+# MZ-2000_SD+偽RAMFILE複合ボード for MZ-80B
 
-![MZ-2000_SD](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/JPEG/TITLE.JPG)
+MZ-2000_SD+偽RAMFILE複合ボードのVGA出力はMZ-2000用でありMZ-80Bではまともな表示が出来ません。
 
-しっぽいいんちょさんが作られた「偽RAMFILE for MZ-1500」を元にしてMZ-2000用にVRAM、GRAMのエミュレートの追加及びMZ-2000_SDと合体させたボードです。
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-
+
+そこでMZ-80BでもVGA出力が正常に表示されるようにプログラムを修正しました。
+
+変更はPico2のプログラムだけで基板はMZ-2000_SD+偽RAMFILE複合ボードをそのまま使います。
+
+MZ-2000_SD+偽RAMFILE複合ボードからテキスト、グラフィックともカラー表示、カラーパレット機能、テキストとグラフィックのプライオリティ、カラー対応PCG機能を削除しています。
+
+モノクロのPCG(FONT再定義)機能は残っていますが、MZ-2000_SD、EMM、VGA出力だけですからあまり魅力は無いと思いますが、GRAM1、GRAM2が装備されていなくともVGA出力からは正常に表示できるようにしたバージョンも作りましたのでGRAM1、GRAM2を装備していないMZ-80Bでは使う価値があると思います。
 
 以下の機能があります。
 
@@ -10,309 +18,83 @@
 
 ・EMM1からの起動(ただし、EMM1にHu-BASICの起動ディスクイメージがある場合のみ)
 
-・MZ-2000のテキスト出力及びグラフィック出力をエミュレートしてVGA出力
+・MZ-80Bのテキスト出力及びグラフィック出力をエミュレートしてVGA出力
 
 ・EMM1エミュレータ(320KByte)
 
 ・漢字ROMボードエミュレータ
 
-・VGA出力される出力をI/Oポートの操作により機能強化(主にテキスト関連)
-
-　　・キャラクタ単位でFONTの変更
-
-　　・FONTキャラクタごとの色(前景色)及び背景色の指定
-
-　　・すべてのキャラクタを1Dot単位で色指定可能なPCG
-
-　　・FONTとPCGのプライオリティ設定
-
-　　・テキストの色パレット機能
-
-　　・グラフィックの色パレット機能
-
-　　・テキストとグラフィックを色ごとにプライオリティ設定
-
-MZ-2000_SD: https://github.com/yanataka60/MZ-2000_SD
-
-#### アップロード済みのuf2ファイルでの正常動作が確認されました。当方ではSourceからの再ビルドにおいても問題は発生していません。
-~~#### 2026.3.5追記 VGA出力はかなりシビアなタイミングになっています。グラフィックスを使いこなしたアクションゲームの中にはVGA出力が追いつかずに正常に表示されないものもあるようです。~~
+・キャラクタ単位でFONTの変更(VGA出力のみ)
 
 ## 回路図
-　KiCadフォルダ内のMZ-2000_SD+NRF.pdfを参照してください。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-[回路図](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/Kiacd/MZ-2000_SD%2BNRF.pdf)
-
-![MZ-2000_SD](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/Kiacd/MZ-2000_SD%2BNRF_1.jpg)
-
-|番号|品名|数量|備考|
-| ------------ | ------------ | ------------ | ------------ |
-|J2,J3|ピンソケット2x15Pin|2|RP2350Bマイコンボード用,秋月電子通商 FHU-2x42SGなど|
-|J4|VGA用基板ソケット 3列15ピン|1|マルツ DJ-VGA14.5など (注1)|
-||J5、J6のいずれか|||
-|J5|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2)|
-|J6|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの(注4)|
-|U1|74LS04|1||
-|U2|74LS30|1||
-|U3|8255|1||
-|U4|Arduino_Pro_Mini_5V|1|Atmega328版を使用 168版は不可。(注3)|
-||RP2350Bボード(Raspberry Pi Pico 2)|1|Amazon WA00021 RP2350Bマイコンボードなど|
-|C1-C3|積層セラミックコンデンサ 0.1uF|3||
-|C4|電解コンデンサ 16v100uF|1||
-|R1-R3|カーボン抵抗 330Ω|3||
-||ピンヘッダ|2Pin分|Arduino_Pro_MiniにはA4、A5用のピンヘッダが付いていないため別途調達が必要です 秋月電子通商 PH-1x40SGなど|
-||ピンソケット(任意)|26Pin分|Arduino_Pro_Miniを取り外し可能としたい場合に調達します 秋月電子通商 FHU-1x42SGなど|
-
-　　　注1)VGA用基板ソケットには、ピン間隔の異なるものがあるようです。マルツ DJ-VGA14.5ではないものを購入する場合はこちらで寸法を確認してください。
-
-　　　https://www.marutsu.co.jp/contents/shop/marutsu/datasheet/DJ-VGA14.5.pdf
-
-　　　注2)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
-
-　　　注3)Arduino Pro MiniはA4、A5ピンも使っています。
-
-　　　注4)MicroSD Card Adapterを使う場合
-
-　　　　　J6に取り付けます。
-
-MicroSD Card Adapterについているピンヘッダを除去してハンダ付けするのが一番確実ですが、J6の穴にMicroSD Card Adapterをぴったりと押しつけ、裏から多めにハンダを流し込むことでハンダ付けをする方法もあります。なお、この方法の時にはしっかりハンダ付けが出来たかテスターで導通を確認しておいた方が安心です。
-
-ハンダ付けに自信のない方はJ5の秋月電子通商　AE-microSD-LLCNVをお使いください。AE-microSD-LLCNVならパワーLED、アクセスLEDが付いています。
-
-![MicroSD Card Adapter1](https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/JPEG/MicroSD%20Card%20Adapter.JPG)
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#%E5%9B%9E%E8%B7%AF%E5%9B%B3
 
 ## 偽RAMFILE for MZ-2000の書込み
+　GRAMの有無により3種類があります。環境に合わせてどちらかを選択してください。なお、「GRAM1のみ装着あり」「GRAM1、GRAM2とも装着無し」を選択してもMZ-80B本体モニタにGRAMが拡張されるわけではありません。VGA出力にのみグラフィックが正常に出力されます。
+
+### GRAM1、GRAM2とも装着あり
 　RP2350Bフォルダにあるniseramfile.uf2をRP2350Bマイコンボードに書き込みます。
 
+　MZ-2000、MZ-2500の2000モードで使用した場合、MZ-2000_SD機能、EMM1エミュレータ、漢字ROMボードエミュレータは問題なく動作しますが、VGA出力機能はVRAM、GRAMのアクセス方法がMZ-80Bと異なるためまともな表示となりません。
+
+### GRAM1のみ装着あり(GRAM2エミュレート)
+　RP2350Bフォルダにあるniseramfile_GRAM1_Only.uf2をRP2350Bマイコンボードに書き込みます。
+
+　グラフィックボートGRAM2が装着されていないこと。
+
+　MZ-2000、MZ-2500(80B、2000、2500モードとも)では正常に動作しません。通常のバージョンniseramfile.uf2を使ってください。
+
+### GRAM1、GRAM2とも装着無し(GRAM1、GRAM2エミュレート)
+　RP2350Bフォルダにあるniseramfile_No_GRAM.uf2をRP2350Bマイコンボードに書き込みます。
+
+　グラフィックボートGRAM1、GRAM2とも装着されていないこと。
+
+　MZ-2000、MZ-2500(80B、2000、2500モードとも)では正常に動作しません。通常のバージョンniseramfile.uf2を使ってください。
+
+### 書込み
 　RP2350BのBOOTボタンを押しながらUSB-Cケーブルを接続するとパソコンがUSBメディアとして認識しますのでniseramfile.uf2をドロップすると自動的に書き込まれます。
 
 　書き込みが終了するとパソコンからはUSBとして見えなくなりますのでそうなったらケーブルを抜いて終了です。
 
 ## MZ-2000_SD BOOT PROGRAMをMZ-1R12 SRAMメモリ 0番バックアップスロットへ書き込み
-　MZ-2000_SDリポジトリEMMフォルダ内のBOOT_A_LOADER.binをMZ-1R12 SRAMメモリ 0番バックアップスロットへ書き込んでください。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-https://github.com/yanataka60/MZ-2000_SD/blob/main/EMM/BOOT_A_LOADER.bin
-
-　書き込みにはpicotool.exeが必要となります。以下のウェブページ右側の「Releases」からダウンロードできます。
-
-https://github.com/raspberrypi/pico-sdk-tools
-
-```
-picotool.exe load -v -x BOOT_A_LOADER.bin  -t bin -o 0x10080000
-```
-
-　次にSDカードに「@BOOT-A MZ-2000.bin」を置きます。作成方法は、MZ-2000_SDを参照してください。
-
-https://github.com/yanataka60/MZ-2000_SD?tab=readme-ov-file#boot-a-mz-xxxxbin%E3%82%92%E4%BD%9C%E6%88%90%E3%81%97%E3%81%A6sd-card%E3%81%AB%E4%BF%9D%E5%AD%98%E3%81%99%E3%82%8B
-
-　また、EMM1に起動可能な内容(HuBASIC起動イメージ)があればEMMからの起動が可能です。
-
-　EMMの内容をチェックしていないのでEMMが起動可能な内容(HuBASIC起動イメージ)でなかった場合には暴走しますのでご注意ください。
-
-　EMMから起動するためには、MZ-2000_SDリポジトリEMMフォルダ内の「@BOOT-EMM1.MZT」をSDカードにコピーしておく必要があります。
-
-　EMM1からの起動方法は、「/」キーとテンキーの「1」を同時に押しながら電源ON時又はIPLリセットすることで「EMM1」のHuBASICから起動させることが出来ます。
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#mz-2000_sd-boot-program%E3%82%92mz-1r12-sram%E3%83%A1%E3%83%A2%E3%83%AA-0%E7%95%AA%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%82%B9%E3%83%AD%E3%83%83%E3%83%88%E3%81%B8%E6%9B%B8%E3%81%8D%E8%BE%BC%E3%81%BF
 
 ## FONTファイルの書込み
-　VGA出力を有効とするためにはMZ-2000のフォントをRP2350Bに書き込む必要があります。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-　MZ-2000はソフトウェア的にフォントを取り出すすべがありません。頑張って作ってください。
-
-　私はオーナーズマニュアルのASCIIコード表を見ながら作成しました。
-
-　書き込みはpicotoolを使います。
-
-```
-picotool.exe load -v -x font.rom  -t bin -o 0x1001f000
-```
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#font%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E6%9B%B8%E8%BE%BC%E3%81%BF
 
 ## Arduinoプログラム
-　MZ-2000_SDを参照してください。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-https://github.com/yanataka60/MZ-2000_SD?tab=readme-ov-file#arduino%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0-1
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#arduino%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0
 
 ## 拡張機能の使い方
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
+
 ### MZ-2000_SDの起動
-　MZ-2000_SDの起動方法と同じです。「/」キーを押しながら電源投入又はIPL RESETしてください。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
+
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#mz-2000_sd%E3%81%AE%E8%B5%B7%E5%8B%95
 
 ### EMM1エミュレータ
-　320KByteのEMM1として機能します。バッテリーバックアップ機能はなく、電源断で内容は消失します。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-　ただし、バックアップ用のSlotが32個用意されているので電源断前にSlotに退避しておくことが可能です。
-
-　また、Slot0の内容は電源投入又はIPL RESETした時にEMM1に自動的にコピーされるのであたかもバッテリーバックアップされていたかのような使い方が出来ます。
-
-　EMMとSlotとのやり取りはI/Oポートから指示します。
-
-#### SlotxxからEMM1への復帰
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|8Ch|W|指定したSlot番号(0～31)のSlotの内容をEMM1に復帰|
-
-#### EMM1からSlotxxへの退避
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|8Dh|W|指定したSlot番号(0～31)のSlotへEMM1の内容を退避|
-
-HuBASICからは以下のようになります。
-
-```
-OUT &H8C,0
-```
-
-```
-OUT &H8D,0
-```
-
-　また、EMM1に起動可能な内容(HuBASIC起動イメージ)があればEMMからの起動が可能です。
-
-　EMMの内容をチェックしていないのでEMMが起動可能な内容(HuBASIC起動イメージ)でなかった場合には暴走しますのでご注意ください。
-
-　EMM1からの起動方法は、「/」キーとテンキーの「1」を同時に押しながら電源ON時又はIPLリセットすることで「EMM1」のHuBASICから起動させることが出来ます。
-
-　EMM1へのHuBASIC起動ディスクイメージ作成は、DISK版HuBASICのUtilityからEMM1へのCOPY ALLで作ってください。
-
-　また、Emulatorで作られたEMMイメージを登録する場合はpicotoolから以下のようにします。
-
-```
-picotool.exe load -v -x EMM_image.bin  -t bin -o 0x10280000
-```
-
-　MZ-1500_SD+NiseRamFileの様にEMMMENUも対応させたいと思います。
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#emm1%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF
 
 ### 漢字・辞書ROM MZ-1R13
-　漢字・辞書ROM MZ-1R13から抽出したデータを登録します。
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。
 
-　抽出にはGET1R13を使いました。
-
-http://fukui.s17.xrea.com/retro/mz2080b/mzgetkrom.html
-
-　出来上がったファイルをpicotoolで登録します。
-
-```
-picotool.exe load -v -x MZ_1R13_DIC.ROM -t bin -o 0x10040000
-```
-
-```
-picotool.exe load -v -x MZ_1R13.ROM  -t bin -o 0x10020000
-```
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#%E6%BC%A2%E5%AD%97%E8%BE%9E%E6%9B%B8rom-mz-1r13
 
 ### FONT変更機能
-一時的にFONTを変更することが出来ます。電源断又はIPL RESETで元に戻ります。以下VGA出力機能に関する設定は電源断又はIPL RESETですべて元に戻ります
+MZ-2000_SD+偽RAMFILE複合ボードを参照してください。FONTカラー設定は出来ません。
 
-キャラクタデータは1キャラクタ8Byteの普通のフォーマットです。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|71h|W|データ書き込み:キャラクタコード+1|
-|72h|W|キャラクタコード指定|
-
-例)
-
-```
-OUT@$72,41:OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF,OUT@$71,$FF
-```
-### FONTカラー設定
-FONTのカラーを指定できます。上位4Bitがキャラクタ色(前景色)、下位4Bitが背景色になります。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|79h|W|キャラクタ色(前景色)を上位4Bitで背景色を下位4Bitで指定する:キャラクタコード+1|
-|7Ah|W|キャラクタコード指定|
-
-例)キャラクタ「A」がGreenで表示されます。
-
-```
-OUT@$7A,41:OUT@$79,$40
-```
-
-### PCG定義
-MZ-1500のPCGと同様の機能です。
-
-1キャラクタ8Byteのキャラクタデータを3プレーン(合計24Byte)に書くことで1Dotごとに色指定が可能です。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|61h|W|キャラクタコード指定|
-|62h|W|書き込みバンク指定(Blue:1,Red:2,Green:3)|
-|63h|W|データ書き込み:キャラクタコード+1|
-
-### PCGの表示切替、FONTテキストとの優先順位変更
-MZ-1500のPCGと同様の機能です。
-
-Bit0でPCG表示の切り替え、Bit1でテキストとPCGの優先順位が変更できます。
-
-|67h|W|Bit1 優先順位 0:テキスト文字色＞PCG＞テキスト背景色<br>　　　　　　1:PCG＞テキスト<br>Bit0 PCG表示  0:PCGを表示しない<br>　　　　　　1:PCGを表示する|
-
-### テキストパレット設定
-テキストの色について上位4Bitで表す色コードを下位4Bitで表す色に変えることが出来ます。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|68h|W|上位4Bitで表す色コードを下位4Bitで表す色で表示する<br>　起動時設定<br>　　0x00<br>　　0x11<br>　　0x22<br>　　0x33<br>　　0x44<br>　　0x55<br>　　0x66<br>　　0x77|
-
-例)起動時WhiteのテキストをGreenに変える
-
-```
-OUT@$68,$74
-```
-
-### グラフィックパレット設定
-テキストの色とは別にグラフィックの色について上位4Bitで表す色コードを下位4Bitで表す色に変えることが出来ます。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|69h|W|上位4Bitで表す色コードを下位4Bitで表す色で表示する<br>　起動時設定<br>　　0x00<br>　　0x11<br>　　0x22<br>　　0x33<br>　　0x44<br>　　0x55<br>　　0x66<br>　　0x77|
-
-例)色指定7のグラフィックをGreenに変える
-
-```
-OUT@$69,$74
-```
-
-### グラフィックとテキストの優先順位変更
-MZ-2000ではI/Oポート$F5によりテキストとグラフィックの優先順位を変更可能ですが、こちらを使うことで色ごとに優先順位を変更することが出来ます。
-
-|アドレス|R/W|説明|
-| ------------ | ------------ | ------------ |
-|6Ah|W|上位4Bitで表す色コードを0Bitが1の時、グラフィック優先、0の時テキスト優先|
-
-## MZ-80B、MZ-2500の80Bモードでの使用について
-　MZ-2000_SD機能、EMM1エミュレータ、漢字ROMボードエミュレータはMZ-80B、MZ-2500の80Bモードでも問題なく動作しますが、VGA出力機能はVRAM、GRAMのアクセス方法がMZ-2000と異なるためまともな表示となりません。
-
-## SAMPLE
-　キャラクタに色を付けるサンプルプログラムを作ってみました。
-
-　えむこまさんが公開されているMZ-80K/C版からの移植DEEP SCAN用に作ってみました。
-
-https://github.com/mkomakonkon/MZ-2000/tree/master/IO/198005_DEEP_SCAN
-
-　フォントファイルを入れ替える必要があるためEmuz-2200用とされていましたがMZ-2000_SD+偽RAMFILE複合ボードなら遊ぶことが出来ます。
-
-　えむこまさんのサイトからダウンロードしたDEEP SCAN.zipを解凍するとFONT.ROMというファイルが含まれていますのでSampleフォルダのDEEP SCANフォルダにある「SET COLOR DEEP SCAN.mzt」の後ろにバイナリエディタなどでくっつけて一つのMZTファイルとします。
-
-　また、DEEP SCANの実行ファイルであるDEEP SCAN.wavはDumpList Editorなどを使ってMZTファイル化してください。(実行アドレスを2000hに指定してMZTファイル化すると便利です)
-
-　後はDEEP SCAN.MZTを実行する前にSET COLOR DEEP SCAN.mztを実行するだけです。
-
-## おまけ
-　グラフィックボードを装着していないMZ-2000でもVGA出力からカラーグラフィックが正常に利用できるバージョンを作ってみました。
-
-　uf2ファイル
-
-https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/blob/main/OMAKE/RP2350B/niseramfile_No_GVRAM.uf2
-
-　ソースファイル
-
-https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/tree/main/OMAKE/Source(No_GVRAM)
-
-### 使用上の注意
-　グラフィックボートが装着されていないこと。
-
-　プレーン1のみのグラフィックボートが装着されている場合も取り外してください。
-
-　MZ-2200もグラフィックボートを取り外せば使えます。
-
-　MZ-80B、MZ-2500(80B、2000、2500モードとも)では正常に動作しません。通常のバージョンを使ってください。
+https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-?tab=readme-ov-file#font%E5%A4%89%E6%9B%B4%E6%A9%9F%E8%83%BD
 
 ## 開発環境、使用ライブラリなど
 　開発環境は、Visual Studio Codeです。
@@ -323,17 +105,3 @@ https://github.com/yanataka60/MZ-2000_SD-NiseRamFile-/tree/main/OMAKE/Source(No_
 
 ## 謝辞
 　素晴らしい拡張モジュールを開発し、自由に改変・公開を快く承諾してくださったしっぽいいんちょさん、ありがとうございました。
-
-## 追記
-2026.3.5 kuran_kuran様よりkuran_kuran様作成ゲームでVGA出力が追いついていない事例の報告がありました。
-
-2026.3.5 アップロード済みのuf2ファイルにおいては正常にVGA出力されることが確認されました。なお、niseramfile.cが$6Aポートの制御が抜けているファイルでしたので更新しました。
-
-2026.3.6 使用ライブラリの記載を追加。
-
-2026.3.6 Sampleプログラムを追加しました。
-
-2026.3.7 開発環境を追記。
-
-2026.3.16 おまけとしてNo_GVRAMバージョンを追加。
-
