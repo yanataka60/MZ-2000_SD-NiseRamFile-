@@ -1,0 +1,14 @@
+﻿                                ;*** AILZ80ASM *** Z-80 Assembler, version 1.0.28.0, LST:Full:4
+       00B1                     MONITOR EQU 00B1H
+000000 12A0                             ORG 12A0H
+                                
+000000 12A0 3E14             7      LD  A,14H
+000002 12A2 0607             7      LD  B,07H
+000004 12A4 D368            11  LOP1:   OUT (68H),A
+000006 12A6 D369            11      OUT (69H),A
+000008 12A8 C610             7      ADD A,10H
+00000A 12AA 10F8            13      DJNZ    LOP1
+00000C 12AC C3B100          10      JP  MONITOR
+                                    
+                                    END
+[EOF:GREEN-MONITOR.s:UTF_8]
