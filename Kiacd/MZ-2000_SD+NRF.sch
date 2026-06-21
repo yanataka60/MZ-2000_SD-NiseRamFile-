@@ -6,7 +6,7 @@ encoding utf-8
 Sheet 1 1
 Title "MZ-2000_SD+NRF"
 Date ""
-Rev "Rev1.0"
+Rev "Rev1.1"
 Comp ""
 Comment1 ""
 Comment2 ""
@@ -964,8 +964,8 @@ F 3 " ~" H 7650 6650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2500 5500 2100 5500
-Text Label 2100 5500 0    50   ~ 0
+	3500 5500 3300 5500
+Text Label 3350 5500 0    50   ~ 0
 +5V
 Text Label 2100 5900 0    50   ~ 0
 D3
@@ -1066,7 +1066,6 @@ Wire Wire Line
 NoConn ~ 3000 6900
 NoConn ~ 2500 5600
 NoConn ~ 2500 5700
-NoConn ~ 3000 5500
 NoConn ~ 3000 5600
 NoConn ~ 5400 5550
 NoConn ~ 5400 5650
@@ -1297,4 +1296,16 @@ Wire Wire Line
 	3950 8800 4500 8800
 Connection ~ 3950 8800
 Connection ~ 3950 10000
+NoConn ~ 2500 5500
+$Comp
+L Device:D D1
+U 1 1 6A1ABE9C
+P 3150 5500
+F 0 "D1" H 3150 5717 50  0000 C CNN
+F 1 "1N5819" H 3150 5626 50  0000 C CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 3150 5500 50  0001 C CNN
+F 3 "~" H 3150 5500 50  0001 C CNN
+	1    3150 5500
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
