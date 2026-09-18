@@ -37,6 +37,7 @@
 //#include "hardware/xip_cache.h"
 
 #define RESET_PIN 25
+#define MONITOR_PIN 40
 
 // RAM configuration
 // MZ-1R12: 32KiB
@@ -70,6 +71,7 @@ volatile uint8_t graphic_write_enable=0;
 volatile uint8_t graphic_write_plane=0;
 volatile uint8_t graphic_enable=0;
 volatile uint8_t graphic_plane_enable = 0x07;
+bool green_monitor = 1;
 // bit0 = B plane
 // bit1 = R plane
 // bit2 = G plane
@@ -225,20 +227,36 @@ void __not_in_flash_func(z80reset)(uint gpio,uint32_t event) {
 	graphic_enable=0;
 	graphic_plane_enable = 0x07;
 	screen_bg_color = 0;
+
+// GPIO40 初期化（グリーンモニタ判定）
+	gpio_init(MONITOR_PIN);
+	gpio_set_dir(MONITOR_PIN, false);  // INPUT
+	gpio_pull_down(MONITOR_PIN);       // 必要に応じて（環境次第）
+	sleep_us(10);                      // 安定待ち
+
+	green_monitor = gpio_get(MONITOR_PIN);
+	
+	if (green_monitor) {
+    // グリーンモニタ用（全色を緑系へ）
+	    pallet[0] = 0;
+	    gpallet[0] = 0;
+	    for(int i=1;i<8;i++) {
+	        pallet[i] = 4;   // 緑固定
+	        gpallet[i] = 4;
+	    }
+	} else {
+    // 通常カラー
+	    for(int i=0;i<8;i++) {
+	        pallet[i]=i;
+	        gpallet[i]=i;
+	    }
+	}
 	
 	memcpy(cgram,fontrom,0x1000);
 
 	for(uint16_t offset=0;offset<0x100;offset++){
 		tcolor[offset]=0x70;
 	}
-
-	for(int i=0;i<8;i++) {
-        pallet[i]=i;
-    }
-
-    for(int i=0;i<8;i++) {
-        gpallet[i]=i;
-    }
 
 	for(int i=0;i<8;i++) {
 		graphic_prio[i]=0;
@@ -666,6 +684,10 @@ static inline void io_write(uint16_t address, uint8_t data)
         case 0x8c:
             emmpage=data&0x1f;
             flash_command=0x30000000+(data&0x1f);        
+            // FLASHからEMMのmemcpy完了を待つ
+            while(flash_command != 0) {
+                tight_loop_contents();
+            }
             return;
 
         case 0x8d:
@@ -726,14 +748,18 @@ static inline void io_write(uint16_t address, uint8_t data)
 //        PALLET CONTROL
 //        case 0xF1:
         case 0x68:
-            pallet[(data&0x70)>>4]=data&7;
+			if (green_monitor==0) {
+            	pallet[(data&0x70)>>4]=data&7;
+			};
             return;
 
 //        GRAPHIC PALLET CONTROL
 //        case 0xF1:
         case 0x69:
-            gpallet[(data&0x70)>>4]=data&7;
-            return;
+			if (green_monitor==0) {
+	            gpallet[(data&0x70)>>4]=data&7;
+			};
+			return;
 
 //        GRAPHIC color priority
         case 0x6A:
@@ -794,7 +820,9 @@ static inline void io_write(uint16_t address, uint8_t data)
     		return;
 
         case 0xF5:  // GRAPHIC color priority
-            pallet[0x07]=data&7;
+			if (green_monitor==0) {
+	            pallet[0x07]=data&7;
+			};
 
             if(data & 0x08){
 				for(int i=0;i<8;i++) {
@@ -868,13 +896,29 @@ void init_emulator(void) {
 	graphic_plane_enable = 0x07;
 	screen_bg_color = 0;
 
-	for(int i=0;i<8;i++) {
-        pallet[i]=i;
-    }
+// GPIO40 初期化（グリーンモニタ判定）
+	gpio_init(MONITOR_PIN);
+	gpio_set_dir(MONITOR_PIN, false);  // INPUT
+	gpio_pull_down(MONITOR_PIN);       // 必要に応じて（環境次第）
+	sleep_us(10);                      // 安定待ち
 
-    for(int i=0;i<8;i++) {
-        gpallet[i]=i;
-    }
+	green_monitor = gpio_get(MONITOR_PIN);
+	
+	if (green_monitor) {
+    // グリーンモニタ用（全色を緑系へ）
+	    pallet[0] = 0;
+	    gpallet[0] = 0;
+	    for(int i=1;i<8;i++) {
+	        pallet[i] = 4;   // 緑固定
+	        gpallet[i] = 4;
+	    }
+	} else {
+    // 通常カラー
+	    for(int i=0;i<8;i++) {
+	        pallet[i]=i;
+	        gpallet[i]=i;
+	    }
+	}
 
     for(int i=0;i<8;i++) {
         graphic_prio[i]=0;
@@ -998,7 +1042,7 @@ void __not_in_flash_func(main_core1)(void) {
 
             }
 
-			gpio_put(32,true);
+//			gpio_put(32,true);
             if(response) {
 
                 // Set GP0-7 to OUTPUT
@@ -1006,6 +1050,8 @@ void __not_in_flash_func(main_core1)(void) {
                 gpio_set_dir_masked(0xff,0xff);
 
                 gpio_put_masked(0xff,data);
+
+				gpio_put(32,true);
 
                 // Wait while RD# is low
 
@@ -1023,6 +1069,8 @@ void __not_in_flash_func(main_core1)(void) {
             	
 
             } else {
+
+				gpio_put(32,true);
 
                 // Wait while RD# is low
                 control=0;
