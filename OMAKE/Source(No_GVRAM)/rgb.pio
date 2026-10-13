@@ -25,12 +25,17 @@ wait 1 irq 1 [3]			; Wait for vsync active mode (starts 5 cycles after execution
 
 
 colorout:
-	pull block				; Pull color value
+	pull block				; Four 8-bit pixels in one 32-bit FIFO word
 ;	out pins, 4	[4]			; Push out to pins (first pixel)
 ;	out pins, 4	[2]			; Push out to pins (next pixel)
 ;   out pins, 4	[CLOCKMUL-1]			; Push out to pins (first pixel)
 ;	out pins, 4	[CLOCKMUL-3]			; Push out to pins (next pixel)
-    out pins, 8	[CLOCKMUL-3]			; Push out to pins
+	; Four pixels take 4 * CLOCKMUL cycles, as before. Between the
+	; fourth OUT and the next first OUT are JMP and PULL (two cycles).
+	out pins, 8 [CLOCKMUL-1]
+	out pins, 8 [CLOCKMUL-1]
+	out pins, 8 [CLOCKMUL-1]
+	out pins, 8 [CLOCKMUL-3]
 	jmp x-- colorout		; Stay here thru horizontal active mode
 
 .wrap
@@ -49,6 +54,7 @@ static inline void rgb_program_init(PIO pio, uint sm, uint offset, uint pin) {
     // parameter to this function is the lowest one. These groups overlap.
     sm_config_set_set_pins(&c, pin, 3);
     sm_config_set_out_pins(&c, pin, 3);
+    sm_config_set_out_shift(&c, true, false, 32);
 //    sm_config_set_set_pins(&c, pin, 5);
 //    sm_config_set_out_pins(&c, pin, 6);
 

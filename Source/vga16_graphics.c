@@ -24,7 +24,7 @@
 #define V_INACTIVE 61
 //#define RGB_ACTIVE 319    // (horizontal active)/2 - 1
 //#define RGB_ACTIVE 159    // (horizontal active)/2 - 1
-#define RGB_ACTIVE 639 // change to this if 1 pixel/byte
+#define RGB_ACTIVE 159 // 160 groups of four pixels per 640-pixel line
 
 // Length of the pixel array, and number of DMA transfers
 //#define TXCOUNT (640*458/2) // Total pixels/2 (since we have 2 pixels per byte)
@@ -38,13 +38,13 @@
 // Pixel color array that is DMA's to the PIO machines and
 // a pointer to the ADDRESS of this color array.
 // Note that this array is automatically initialized to all 0's (black)
-unsigned char vga_data_array[TXCOUNT_LINE*4];
+unsigned char __attribute__((aligned(4))) vga_data_array[TXCOUNT_LINE*4];
 char * address_pointer = &vga_data_array[0] ;
 
 // Address table for scanlines
 
 unsigned char __attribute__  ((aligned(sizeof(unsigned char *)*512))) *vga_address_table[512];
-unsigned char vga_null_array[TXCOUNT_LINE];
+unsigned char __attribute__((aligned(4))) vga_null_array[TXCOUNT_LINE];
 
 #if 0
 // Bit masks for drawPixel routine
@@ -144,7 +144,7 @@ void initVGA() {
 
     // Channel Zero (sends color data to PIO VGA machine)
     dma_channel_config c0 = dma_channel_get_default_config(rgb_chan_0);  // default configs
-    channel_config_set_transfer_data_size(&c0, DMA_SIZE_8);              // 8-bit txfers
+    channel_config_set_transfer_data_size(&c0, DMA_SIZE_32);             // four pixels per FIFO word
     channel_config_set_read_increment(&c0, true);                        // yes read incrementing
     channel_config_set_write_increment(&c0, false);                      // no write incrementing
     channel_config_set_dreq(&c0, DREQ_PIO0_TX2) ;                        // DREQ_PIO0_TX2 pacing (FIFO)
@@ -164,7 +164,7 @@ void initVGA() {
         &c0,                        // The configuration we just created
         &pio->txf[rgb_sm],          // write address (RGB PIO TX FIFO)
         &vga_data_array,            // The initial read address (pixel color array)
-        TXCOUNT_LINE,                    // Number of transfers; in this case each is 1 byte.
+        TXCOUNT_LINE / 4,                // 160 transfers, each containing four pixels.
         false                       // Don't start immediately.
     );
 

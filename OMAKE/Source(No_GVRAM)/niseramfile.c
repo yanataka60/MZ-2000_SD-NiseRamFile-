@@ -133,7 +133,7 @@ uint8_t *romslots=(uint8_t *)(ROMBASE);
 uint8_t *emmslots=(uint8_t *)(ROMBASE+(0x8000*MAXROMPAGE));
 
 // VGA Output
-uint8_t scandata[640];
+uint8_t *scandata;
 //uint8_t scandata[320];
 extern unsigned char vga_data_array[];
 volatile uint32_t video_hsync,video_vsync,scanline,vsync_scanline;
@@ -183,12 +183,9 @@ void __not_in_flash_func(hsync_handler)(void) {
             vramindex=(tmsscan%4)*640;
 //            vramindex=(tmsscan%4)*320;
 
+            // Render into the inactive four-line VGA ring slot.
+            scandata=&vga_data_array[vramindex];
             mzscan(tmsscan);
-
-            for(int j=0;j<640;j++) {
-//            for(int j=0;j<320;j++) {
-                vga_data_array[vramindex+j]=scandata[j];
-            }           
         }
 
     }
@@ -288,7 +285,30 @@ void __not_in_flash_func(mzscan)(uint8_t scan)
 }
 
 
-static uint8_t textbgflag[640];
+static uint8_t __attribute__((aligned(4))) textbgflag[640];
+typedef uint32_t vga_word_t __attribute__((may_alias));
+
+// Blend four graphics pixels into a VGA word while preserving text/PCG
+// priority. Both VGA scanline buffers are four-byte aligned.
+static inline __attribute__((always_inline)) void graphics_blend4(uint8_t *dst, const uint8_t *text_bg,
+                                   uint32_t packed_indices)
+{
+    uint32_t pixels = __builtin_bswap32(packed_indices);
+    uint8_t p0 = (uint8_t)pixels;
+    uint8_t p1 = (uint8_t)(pixels >> 8);
+    uint8_t p2 = (uint8_t)(pixels >> 16);
+    uint8_t p3 = (uint8_t)(pixels >> 24);
+    uint32_t colors = (uint32_t)gpallet[p0]
+                    | ((uint32_t)gpallet[p1] << 8)
+                    | ((uint32_t)gpallet[p2] << 16)
+                    | ((uint32_t)gpallet[p3] << 24);
+    uint32_t mask = ((uint32_t)(p0 && (graphic_prio[p0] || text_bg[0])) * 255u)
+                  | (((uint32_t)(p1 && (graphic_prio[p1] || text_bg[1])) * 255u) << 8)
+                  | (((uint32_t)(p2 && (graphic_prio[p2] || text_bg[2])) * 255u) << 16)
+                  | (((uint32_t)(p3 && (graphic_prio[p3] || text_bg[3])) * 255u) << 24);
+    uint32_t previous = ((vga_word_t *)dst)[0];
+    ((vga_word_t *)dst)[0] = (previous & ~mask) | (colors & mask);
+}
 
 void __not_in_flash_func(mzscan80)(uint8_t scan)
 {
@@ -317,8 +337,34 @@ void __not_in_flash_func(mzscan80)(uint8_t scan)
 		uint8_t bg=color&7;
 
 		uint8_t font=cgram[(ch<<3)+scanyy];
+		// Blank glyph row without PCG: all eight pixels are text background.
+		if(!pcg1 && font==0){
+			uint32_t col=(uint32_t)pallet[bg]*0x01010101u;
+			((vga_word_t*)dst)[0]=col;
+			((vga_word_t*)dst)[1]=col;
+			((vga_word_t*)bgf)[0]=0x01010101u;
+			((vga_word_t*)bgf)[1]=0x01010101u;
+			dst+=8;
+			bgf+=8;
+			continue;
+		}
 
 		uint32_t *bf=&bitexpand[(uint32_t)font<<2];
+		// For ordinary text the foreground and background masks cannot
+		// overlap. Compose four VGA pixels and their overlay flags per store.
+		if(!pcg1){
+			uint32_t front=(uint32_t)pallet[fg]*0x01010101u;
+			uint32_t back=(uint32_t)pallet[bg]*0x01010101u;
+			uint32_t mask1=bf[1]*255u;
+			uint32_t mask2=bf[0]*255u;
+			((vga_word_t*)dst)[0]=(front&mask1)|(back&~mask1);
+			((vga_word_t*)dst)[1]=(front&mask2)|(back&~mask2);
+			((vga_word_t*)bgf)[0]=fg ? bf[3] : 0x01010101u;
+			((vga_word_t*)bgf)[1]=fg ? bf[2] : 0x01010101u;
+			dst+=8;
+			bgf+=8;
+			continue;
+		}
 
 		uint32_t f1=bf[1]*fg;
 		uint32_t f2=bf[0]*fg;
@@ -416,6 +462,28 @@ void __not_in_flash_func(mzscan80)(uint8_t scan)
 			uint8_t vr=(pen&2)?gvramr[offs+bx]:0;
 			uint8_t vg=(pen&4)?gvramg[offs+bx]:0;
 
+			// Filled/cleared graphics planes produce a single color for this
+			// eight-pixel group. Avoid all bit expansion and palette lookups.
+			if((vb==0 || vb==0xff) && (vr==0 || vr==0xff) &&
+			   (vg==0 || vg==0xff)){
+				uint8_t v=(vb!=0) | ((vr!=0)<<1) | ((vg!=0)<<2);
+				if(v){
+					uint32_t color=(uint32_t)gpallet[v]*0x01010101u;
+					if(graphic_prio[v]){
+						((vga_word_t*)dstg)[0]=color;
+						((vga_word_t*)dstg)[1]=color;
+					}else{
+						uint32_t mask0=((vga_word_t*)bg)[0]*255u;
+						uint32_t mask1=((vga_word_t*)bg)[1]*255u;
+						((vga_word_t*)dstg)[0]=(((vga_word_t*)dstg)[0]&~mask0)|(color&mask0);
+						((vga_word_t*)dstg)[1]=(((vga_word_t*)dstg)[1]&~mask1)|(color&mask1);
+					}
+				}
+				dstg+=8;
+				bg+=8;
+				continue;
+			}
+
 			uint32_t b=
 			bitexpand[vb*4]
 				+bitexpand[vr*4]*2
@@ -426,31 +494,10 @@ void __not_in_flash_func(mzscan80)(uint8_t scan)
 				+bitexpand[vr*4+1]*2
 				+bitexpand[vg*4+1]*4;
 
-			uint8_t *p1=(uint8_t*)&b;
-			uint8_t *p2=(uint8_t*)&f;
-
-			#define DRAW(px)\
-				{\
-					uint8_t v=(px);\
-					if(v){\
-						uint8_t col=gpallet[v];\
-						if(graphic_prio[v] || *bg)\
-							*dstg=col;\
-						}\
-						dstg++;\
-						bg++;\
-				}
-
-				DRAW(p1[3]);
-				DRAW(p1[2]);
-				DRAW(p1[1]);
-				DRAW(p1[0]);
-
-				DRAW(p2[3]);
-				DRAW(p2[2]);
-				DRAW(p2[1]);
-				DRAW(p2[0]);
-			#undef DRAW
+			graphics_blend4(dstg, bg, b);
+			graphics_blend4(dstg+4, bg+4, f);
+			dstg+=8;
+			bg+=8;
 		}
 	}
 }
@@ -482,8 +529,37 @@ void __not_in_flash_func(mzscan40)(uint8_t scan)
 		uint8_t bg=color&7;
 
 		uint8_t font=cgram[(ch<<3)+scanyy];
+		// In 40-column mode each blank glyph pixel is displayed twice.
+		if(!pcg1 && font==0){
+			uint32_t col=(uint32_t)pallet[bg]*0x01010101u;
+			for(int i=0;i<4;i++){
+				((vga_word_t*)dst)[i]=col;
+				((vga_word_t*)bgf)[i]=0x01010101u;
+			}
+			dst+=16;
+			bgf+=16;
+			continue;
+		}
 
 		uint32_t *bf=&bitexpand[(uint32_t)font<<2];
+		if(!pcg1){
+			uint32_t front=(uint32_t)pallet[fg]*0x01010101u;
+			uint32_t back=(uint32_t)pallet[bg]*0x01010101u;
+			for(int half=0;half<2;half++){
+				uint32_t bits=bf[half ? 0 : 1]*255u;
+				uint32_t colors=(front&bits)|(back&~bits);
+				uint32_t flags=fg ? bf[half ? 2 : 3] : 0x01010101u;
+				uint8_t *p=(uint8_t*)&colors;
+				uint8_t *f=(uint8_t*)&flags;
+				((vga_word_t*)dst)[0]=(uint32_t)p[0]*0x0101u | (uint32_t)p[1]*0x01010000u;
+				((vga_word_t*)dst)[1]=(uint32_t)p[2]*0x0101u | (uint32_t)p[3]*0x01010000u;
+				((vga_word_t*)bgf)[0]=(uint32_t)f[0]*0x0101u | (uint32_t)f[1]*0x01010000u;
+				((vga_word_t*)bgf)[1]=(uint32_t)f[2]*0x0101u | (uint32_t)f[3]*0x01010000u;
+				dst+=8;
+				bgf+=8;
+			}
+			continue;
+		}
 
 		uint32_t f1=bf[0]*fg;
 		uint32_t f2=bf[1]*fg;
@@ -592,6 +668,26 @@ void __not_in_flash_func(mzscan40)(uint8_t scan)
 			uint8_t vr=(pen&2)?gvramr[offs+bx]:0;
 			uint8_t vg=(pen&4)?gvramg[offs+bx]:0;
 
+			if((vb==0 || vb==0xff) && (vr==0 || vr==0xff) &&
+			   (vg==0 || vg==0xff)){
+				uint8_t v=(vb!=0) | ((vr!=0)<<1) | ((vg!=0)<<2);
+				if(v){
+					uint32_t color=(uint32_t)gpallet[v]*0x01010101u;
+					if(graphic_prio[v]){
+						((vga_word_t*)dstg)[0]=color;
+						((vga_word_t*)dstg)[1]=color;
+					}else{
+						uint32_t mask0=((vga_word_t*)bg)[0]*255u;
+						uint32_t mask1=((vga_word_t*)bg)[1]*255u;
+						((vga_word_t*)dstg)[0]=(((vga_word_t*)dstg)[0]&~mask0)|(color&mask0);
+						((vga_word_t*)dstg)[1]=(((vga_word_t*)dstg)[1]&~mask1)|(color&mask1);
+					}
+				}
+				dstg+=8;
+				bg+=8;
+				continue;
+			}
+
 			uint32_t b=
 				bitexpand[vb*4]
 				+bitexpand[vr*4]*2
@@ -602,31 +698,10 @@ void __not_in_flash_func(mzscan40)(uint8_t scan)
 				+bitexpand[vr*4+1]*2
 				+bitexpand[vg*4+1]*4;
 
-			uint8_t *p1=(uint8_t*)&b;
-			uint8_t *p2=(uint8_t*)&f;
-
-			#define DRAW(px)\
-			{\
-				if(px){\
-					uint8_t col=gpallet[px];\
-					if(graphic_prio[px] || *bg)\
-						*dstg=col;\
-				}\
-				dstg++;\
-				bg++;\
-			}
-
-			DRAW(p1[3]);
-			DRAW(p1[2]);
-			DRAW(p1[1]);
-			DRAW(p1[0]);
-
-			DRAW(p2[3]);
-			DRAW(p2[2]);
-			DRAW(p2[1]);
-			DRAW(p2[0]);
-
-			#undef DRAW
+			graphics_blend4(dstg, bg, b);
+			graphics_blend4(dstg+4, bg+4, f);
+			dstg+=8;
+			bg+=8;
 
 		}
 	}
